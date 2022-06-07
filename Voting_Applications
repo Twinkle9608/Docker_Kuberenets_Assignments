@@ -1,0 +1,98 @@
+
+Question 4:
+
+Step 1:  go to root (cd /root/ ) 
+Step2:  git clone https://github.com/ashishrpandey/example-voting-app
+Step3: go to /root/example-voting-app/k8s-specifications
+Step4:  kubectl apply -f .
+Observation: Only 1 person can vote for 1 animal
+
+********************************************************************************************************************************************
+https://aws.amazon.com/amazon-linux-2/
+[ec2-user@ip-172-31-25-133 ~]$ ls
+[ec2-user@ip-172-31-25-133 ~]$ cd ..
+[ec2-user@ip-172-31-25-133 home]$ cd /root/
+-bash: cd: /root/: Permission denied
+[ec2-user@ip-172-31-25-133 home]$ ls
+ec2-user
+[ec2-user@ip-172-31-25-133 home]$ cd root/
+-bash: cd: root/: No such file or directory
+[ec2-user@ip-172-31-25-133 home]$  git clone https://github.com/ashishrpandey/ex                                                                             ample-voting-app
+fatal: could not create work tree dir 'example-voting-app': Permission denied
+[ec2-user@ip-172-31-25-133 home]$ sudo su -
+Last login: Tue Jun  7 04:49:45 UTC 2022 on pts/0
+[root@ip-172-31-25-133 ~]# cd root/
+-bash: cd: root/: No such file or directory
+[root@ip-172-31-25-133 ~]# git clone https://github.com/ashishrpandey/example-voting-app
+fatal: destination path 'example-voting-app' already exists and is not an empty directory.
+[root@ip-172-31-25-133 ~]# ls
+cron  example-voting-app  kubernetes-training  multi-completion-parallel-batch-job.yaml
+[root@ip-172-31-25-133 ~]# cd example-voting-app/
+[root@ip-172-31-25-133 example-voting-app]# ls
+architecture.png  docker-compose-javaworker.yml  docker-compose.yml  k8s-specifications  MAINTAINERS  result  worker
+dockercloud.yml   docker-compose-simple.yml      docker-stack.yml    LICENSE             README.md    vote
+[root@ip-172-31-25-133 example-voting-app]# cd k8s-specifications/
+[root@ip-172-31-25-133 k8s-specifications]# ls
+db-deployment.yaml  redis-deployment.yaml  result-deployment.yaml  vote-deployment.yaml  worker-deployment.yaml
+db-service.yaml     redis-service.yaml     result-service.yaml     vote-service.yaml
+[root@ip-172-31-25-133 k8s-specifications]#  kubectl apply -f .
+deployment.apps/db unchanged
+service/db unchanged
+deployment.apps/redis unchanged
+service/redis unchanged
+deployment.apps/result unchanged
+service/result unchanged
+deployment.apps/vote unchanged
+service/vote unchanged
+deployment.apps/worker unchanged
+[root@ip-172-31-25-133 k8s-specifications]# kubectl get svc
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+db           ClusterIP   10.102.12.232   <none>        5432/TCP         21m
+kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP          24m
+redis        ClusterIP   10.110.73.107   <none>        6379/TCP         21m
+result       NodePort    10.111.53.118   <none>        5001:31001/TCP   21m
+vote         NodePort    10.96.252.180   <none>        5000:31000/TCP   21m
+
+Step 5: the Pods one by one (first voting Pod, then worker pod, then db pod). by commands 1) kubectl delete vote-94849dc97-5mn4d, 2)kubectl delete pod worker-dd46d7584-hj95z, 3)
+kubectl delete pod db-b54cd94f4-lw5vq
+
+****************************************************************************************************************************
+[root@ip-172-31-25-133 k8s-specifications]# kubectl get svc
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE 
+db           ClusterIP   10.108.0.206     <none>        5432/TCP         30s
+kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP          76s
+redis        ClusterIP   10.102.224.157   <none>        6379/TCP         30s
+result       NodePort    10.102.110.236   <none>        5001:31001/TCP   30s
+vote         NodePort    10.101.204.6     <none>        5000:31000/TCP   30s
+[root@ip-172-31-25-133 k8s-specifications]# kubectl get po
+NAME                      READY   STATUS    RESTARTS   AGE
+db-b54cd94f4-lw5vq        2/2     Running   0          2m3s
+redis-868d64d78-gvzlq     2/2     Running   0          2m3s
+result-5d57b59f4b-bsl4w   2/2     Running   0          2m3s
+vote-94849dc97-5mn4d      2/2     Running   0          2m3s
+worker-dd46d7584-hj95z    2/2     Running   0          2m3s
+[root@ip-172-31-25-133 k8s-specifications]# kubectl delete vote-94849dc97-5mn4d
+error: the server doesn't have a resource type "vote-94849dc97-5mn4d"
+[root@ip-172-31-25-133 k8s-specifications]# kubectl delete pod vote-94849dc97-5mn4d
+pod "vote-94849dc97-5mn4d" deleted
+^C
+[root@ip-172-31-25-133 k8s-specifications]# kubectl delete pod worker-dd46d7584-hj95z
+pod "worker-dd46d7584-hj95z" deleted
+^C
+[root@ip-172-31-25-133 k8s-specifications]# kubectl delete pod db-b54cd94f4-lw5vq
+pod "db-b54cd94f4-lw5vq" deleted
+^C
+[root@ip-172-31-25-133 k8s-specifications]# kubectl delete pod db-b54cd94f4-lw5vq
+Error from server (NotFound): pods "db-b54cd94f4-lw5vq" not found
+[root@ip-172-31-25-133 k8s-specifications]# kubectl delete pod result-5d57b59f4b-bsl4w
+pod "result-5d57b59f4b-bsl4w" deleted
+[root@ip-172-31-25-133 k8s-specifications]# kubectl get po
+NAME                      READY   STATUS    RESTARTS   AGE
+db-b54cd94f4-2hmhx        2/2     Running   0          2m45s
+redis-868d64d78-gvzlq     2/2     Running   0          6m23s
+result-5d57b59f4b-29s96   2/2     Running   0          2m3s
+vote-94849dc97-fl9qj      2/2     Running   0          3m44s
+worker-dd46d7584-dc2kx    2/2     Runn ing   0          3m22s
+[root@ip-172-31-25-133 k8s-specifications]#
+
+Observations: After Deleting vote worker and DB node, observed that vote reset to 50-50% and then after deletion of result pod observed that it reset to 100%
